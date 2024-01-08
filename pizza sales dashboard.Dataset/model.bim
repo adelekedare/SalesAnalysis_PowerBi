@@ -1,0 +1,967 @@
+{
+  "compatibilityLevel": 1567,
+  "model": {
+    "annotations": [
+      {
+        "name": "__PBI_TimeIntelligenceEnabled",
+        "value": "0"
+      },
+      {
+        "name": "PBIDesktopVersion",
+        "value": "2.119.666.0 (23.07)"
+      },
+      {
+        "name": "PBI_QueryOrder",
+        "value": "[\"pizza_table\",\"Order details\",\"Order\",\"Pizza type\",\"Query1\",\"Date table\",\"Measure table\"]"
+      },
+      {
+        "name": "PBI_ProTooling",
+        "value": "[\"DevMode\"]"
+      }
+    ],
+    "culture": "en-US",
+    "cultures": [
+      {
+        "name": "en-US",
+        "linguisticMetadata": {
+          "content": {
+            "DynamicImprovement": "HighConfidence",
+            "Entities": {
+              "measure_table.total_order": {
+                "Definition": {
+                  "Binding": {
+                    "ConceptualEntity": "Measure table",
+                    "ConceptualProperty": "Total Order"
+                  }
+                },
+                "State": "Generated",
+                "Terms": [
+                  {
+                    "Classic deluxe": {
+                      "Source": {
+                        "Agent": "PowerBI.VisualColumnRename",
+                        "Type": "External"
+                      },
+                      "State": "Suggested",
+                      "Weight": 0.9
+                    }
+                  },
+                  {
+                    "Brie carre": {
+                      "Source": {
+                        "Agent": "PowerBI.VisualColumnRename",
+                        "Type": "External"
+                      },
+                      "State": "Suggested",
+                      "Weight": 0.9
+                    }
+                  }
+                ]
+              },
+              "measure_table.total_sales": {
+                "Definition": {
+                  "Binding": {
+                    "ConceptualEntity": "Measure table",
+                    "ConceptualProperty": "TOtal sales"
+                  }
+                },
+                "State": "Generated",
+                "Terms": [
+                  {
+                    "Thai chicken": {
+                      "Source": {
+                        "Agent": "PowerBI.VisualColumnRename",
+                        "Type": "External"
+                      },
+                      "State": "Suggested",
+                      "Weight": 0.9
+                    }
+                  },
+                  {
+                    "Revenue": {
+                      "Source": {
+                        "Agent": "PowerBI.VisualColumnRename",
+                        "Type": "External"
+                      },
+                      "State": "Suggested",
+                      "Weight": 0.9
+                    }
+                  }
+                ]
+              }
+            },
+            "Language": "en-US",
+            "Version": "2.0.0"
+          },
+          "contentType": "json"
+        }
+      }
+    ],
+    "dataAccessOptions": {
+      "legacyRedirects": true,
+      "returnErrorValuesAsNull": true
+    },
+    "defaultPowerBIDataSourceVersion": "powerBI_V3",
+    "expressions": [
+      {
+        "name": "Query1",
+        "annotations": [
+          {
+            "name": "PBI_NavigationStepName",
+            "value": "Navigation"
+          },
+          {
+            "name": "PBI_ResultType",
+            "value": "Function"
+          }
+        ],
+        "expression": [
+          "let fnDateTable = (StartDate as date, EndDate as date, FYStartMonth as number) as table =>",
+          "  let",
+          "    DayCount = Duration.Days(Duration.From(EndDate - StartDate)),",
+          "    Source = List.Dates(StartDate,DayCount,#duration(1,0,0,0)),",
+          "    TableFromList = Table.FromList(Source, Splitter.SplitByNothing()),   ",
+          "    ChangedType = Table.TransformColumnTypes(TableFromList,{{\"Column1\", type date}}),",
+          "    RenamedColumns = Table.RenameColumns(ChangedType,{{\"Column1\", \"Date\"}}),",
+          "    InsertYear = Table.AddColumn(RenamedColumns, \"Year\", each Date.Year([Date]),type text),",
+          "    InsertYearNumber = Table.AddColumn(RenamedColumns, \"YearNumber\", each Date.Year([Date])),",
+          "    InsertQuarter = Table.AddColumn(InsertYear, \"QuarterOfYear\", each Date.QuarterOfYear([Date])),",
+          "    InsertMonth = Table.AddColumn(InsertQuarter, \"MonthOfYear\", each Date.Month([Date]), type text),",
+          "    InsertDay = Table.AddColumn(InsertMonth, \"DayOfMonth\", each Date.Day([Date])),",
+          "    InsertDayInt = Table.AddColumn(InsertDay, \"DateInt\", each [Year] * 10000 + [MonthOfYear] * 100 + [DayOfMonth]),",
+          "    InsertMonthName = Table.AddColumn(InsertDayInt, \"MonthName\", each Date.ToText([Date], \"MMMM\"), type text),",
+          "    InsertCalendarMonth = Table.AddColumn(InsertMonthName, \"MonthInCalendar\", each (try(Text.Range([MonthName],0,3)) otherwise [MonthName]) & \" \" & Number.ToText([Year])),",
+          "    InsertCalendarQtr = Table.AddColumn(InsertCalendarMonth, \"QuarterInCalendar\", each \"Q\" & Number.ToText([QuarterOfYear]) & \" \" & Number.ToText([Year])),",
+          "    InsertDayWeek = Table.AddColumn(InsertCalendarQtr, \"DayInWeek\", each Date.DayOfWeek([Date])),",
+          "    InsertDayName = Table.AddColumn(InsertDayWeek, \"DayOfWeekName\", each Date.ToText([Date], \"dddd\"), type text),",
+          "    InsertWeekEnding = Table.AddColumn(InsertDayName, \"WeekEnding\", each Date.EndOfWeek([Date]), type date),",
+          "    InsertWeekNumber= Table.AddColumn(InsertWeekEnding, \"Week Number\", each Date.WeekOfYear([Date])),",
+          "    InsertMonthnYear = Table.AddColumn(InsertWeekNumber,\"MonthnYear\", each [Year] * 10000 + [MonthOfYear] * 100),",
+          "    InsertQuarternYear = Table.AddColumn(InsertMonthnYear,\"QuarternYear\", each [Year] * 10000 + [QuarterOfYear] * 100),",
+          "    ChangedType1 = Table.TransformColumnTypes(InsertQuarternYear,{{\"QuarternYear\", Int64.Type},{\"Week Number\", Int64.Type},{\"Year\", type text},{\"MonthnYear\", Int64.Type}, {\"DateInt\", Int64.Type}, {\"DayOfMonth\", Int64.Type}, {\"MonthOfYear\", Int64.Type}, {\"QuarterOfYear\", Int64.Type}, {\"MonthInCalendar\", type text}, {\"QuarterInCalendar\", type text}, {\"DayInWeek\", Int64.Type}}),",
+          "    InsertShortYear = Table.AddColumn(ChangedType1, \"ShortYear\", each Text.End(Text.From([Year]), 2), type text),",
+          "    AddFY = Table.AddColumn(InsertShortYear, \"FY\", each \"FY\"&(if [MonthOfYear]>=FYStartMonth then Text.From(Number.From([ShortYear])+1) else [ShortYear]))",
+          "in",
+          "    AddFY",
+          "in",
+          "    fnDateTable"
+        ],
+        "kind": "m",
+        "lineageTag": "2b4fa28b-c268-431d-a4be-66a99c79c8c4"
+      }
+    ],
+    "relationships": [
+      {
+        "name": "f78e16ad-ffa1-4308-9952-9cf51facf5bb",
+        "fromColumn": "Date",
+        "fromTable": "Order",
+        "toColumn": "Date",
+        "toTable": "Date table"
+      },
+      {
+        "name": "bc980a6f-056a-4fe1-b8bc-cfc85a1f02cc",
+        "crossFilteringBehavior": "bothDirections",
+        "fromColumn": "order_id",
+        "fromTable": "Order details",
+        "securityFilteringBehavior": "bothDirections",
+        "toColumn": "Order id",
+        "toTable": "Order"
+      },
+      {
+        "name": "904b9796-3bb1-43d7-9266-2c1281b16913",
+        "fromColumn": "pizza_id",
+        "fromTable": "Order details",
+        "toColumn": "pizza_id",
+        "toTable": "pizza_table"
+      },
+      {
+        "name": "f88158de-bb00-419d-bd12-9dad5d0dc73c",
+        "fromColumn": "pizza_type_id",
+        "fromTable": "pizza_table",
+        "toColumn": "pizza_type_id",
+        "toTable": "Pizza type"
+      }
+    ],
+    "sourceQueryCulture": "en-NG",
+    "tables": [
+      {
+        "name": "Date table",
+        "annotations": [
+          {
+            "name": "PBI_NavigationStepName",
+            "value": "Navigation"
+          },
+          {
+            "name": "PBI_ResultType",
+            "value": "Table"
+          }
+        ],
+        "columns": [
+          {
+            "name": "Date",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              },
+              {
+                "name": "UnderlyingDateTimeDataType",
+                "value": "Date"
+              }
+            ],
+            "dataType": "dateTime",
+            "formatString": "Long Date",
+            "lineageTag": "a2342873-f001-44de-8f13-7f59a589341a",
+            "sourceColumn": "Date",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "DayInWeek",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ],
+            "dataType": "int64",
+            "formatString": "0",
+            "lineageTag": "8d8433a8-2541-40a2-8bf5-c3a0c65cc2a6",
+            "sourceColumn": "DayInWeek",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "MonthInyr",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ],
+            "changedProperties": [
+              {
+                "property": "SortByColumn"
+              }
+            ],
+            "dataType": "string",
+            "lineageTag": "fc907071-2f9e-4a15-8b20-0a5134b57bb6",
+            "sortByColumn": "Month_num",
+            "sourceColumn": "MonthInyr",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "MonthName",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ],
+            "changedProperties": [
+              {
+                "property": "SortByColumn"
+              }
+            ],
+            "dataType": "string",
+            "lineageTag": "7c2ec9b9-ffa9-4017-9ec6-2b5c4bdd5a90",
+            "sortByColumn": "Month_num",
+            "sourceColumn": "MonthName",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "Month_num",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ],
+            "dataType": "int64",
+            "formatString": "0",
+            "lineageTag": "8dfef0f4-b9bd-4d67-af72-4a2ec82d4b83",
+            "sourceColumn": "Month_num",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "Qtr",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ],
+            "dataType": "int64",
+            "formatString": "0",
+            "lineageTag": "1ac7bcc6-9618-49c7-b0b0-32ff8c4c9e60",
+            "sourceColumn": "Qtr",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "QuarterInCalendar",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ],
+            "changedProperties": [
+              {
+                "property": "SortByColumn"
+              }
+            ],
+            "dataType": "string",
+            "lineageTag": "5423e290-12f7-406e-a6b1-0a55bbd68281",
+            "sortByColumn": "Qtr",
+            "sourceColumn": "QuarterInCalendar",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "ShortYear",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ],
+            "dataType": "string",
+            "lineageTag": "84c448dd-dd74-4c12-ad2a-3e5277da8e09",
+            "sourceColumn": "ShortYear",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "Year",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ],
+            "dataType": "string",
+            "lineageTag": "7a7ca731-1c9d-4f6d-b16e-8e200b923335",
+            "sourceColumn": "Year",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "days",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ],
+            "changedProperties": [
+              {
+                "property": "SortByColumn"
+              }
+            ],
+            "dataType": "string",
+            "lineageTag": "8889ca9d-550d-47f7-bc94-7451f55dbfe6",
+            "sortByColumn": "DayInWeek",
+            "sourceColumn": "days",
+            "summarizeBy": "none"
+          }
+        ],
+        "lineageTag": "1d4b99e7-a013-441a-a224-2c652291b7c7",
+        "partitions": [
+          {
+            "name": "Date table",
+            "mode": "import",
+            "source": {
+              "expression": [
+                "let",
+                "    Source = Query1(#date(2014, 1, 1), #date(2016, 12, 31), 1),",
+                "    #\"Renamed Columns\" = Table.RenameColumns(Source,{{\"QuarterOfYear\", \"Qtr\"}, {\"MonthOfYear\", \"Month_num\"}}),",
+                "    #\"Removed Columns\" = Table.RemoveColumns(#\"Renamed Columns\",{\"DayOfMonth\", \"DateInt\"}),",
+                "    #\"Split Column by Position\" = Table.SplitColumn(#\"Removed Columns\", \"MonthName\", Splitter.SplitTextByPositions({0, 3}, false), {\"MonthName.1\", \"MonthName.2\"}),",
+                "    #\"Changed Type\" = Table.TransformColumnTypes(#\"Split Column by Position\",{{\"MonthName.1\", type text}, {\"MonthName.2\", type text}}),",
+                "    #\"Removed Columns1\" = Table.RemoveColumns(#\"Changed Type\",{\"MonthName.2\"}),",
+                "    #\"Renamed Columns1\" = Table.RenameColumns(#\"Removed Columns1\",{{\"MonthName.1\", \"MonthName\"}, {\"MonthInCalendar\", \"MonthInyr\"}}),",
+                "    #\"Split Column by Position1\" = Table.SplitColumn(#\"Renamed Columns1\", \"DayOfWeekName\", Splitter.SplitTextByPositions({0, 3}, false), {\"DayOfWeekName.1\", \"DayOfWeekName.2\"}),",
+                "    #\"Changed Type1\" = Table.TransformColumnTypes(#\"Split Column by Position1\",{{\"DayOfWeekName.1\", type text}, {\"DayOfWeekName.2\", type text}}),",
+                "    #\"Removed Columns2\" = Table.RemoveColumns(#\"Changed Type1\",{\"DayOfWeekName.2\"}),",
+                "    #\"Renamed Columns2\" = Table.RenameColumns(#\"Removed Columns2\",{{\"DayOfWeekName.1\", \"days\"}}),",
+                "    #\"Removed Columns3\" = Table.RemoveColumns(#\"Renamed Columns2\",{\"WeekEnding\", \"Week Number\", \"MonthnYear\", \"QuarternYear\", \"FY\"})",
+                "in",
+                "    #\"Removed Columns3\""
+              ],
+              "type": "m"
+            }
+          }
+        ]
+      },
+      {
+        "name": "Measure table",
+        "annotations": [
+          {
+            "name": "PBI_ResultType",
+            "value": "Table"
+          }
+        ],
+        "columns": [
+          {
+            "name": "Column1",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ],
+            "dataType": "string",
+            "lineageTag": "4ff5c720-1c67-43ea-933f-f9e53530945b",
+            "sourceColumn": "Column1",
+            "summarizeBy": "none"
+          }
+        ],
+        "lineageTag": "868bbc83-443a-4f50-8f02-84d2169901d9",
+        "measures": [
+          {
+            "name": "TOtal sales",
+            "annotations": [
+              {
+                "name": "PBI_FormatHint",
+                "value": "{\"currencyCulture\":\"en-US\"}"
+              }
+            ],
+            "expression": [
+              "SUM('Order details'[Sales])",
+              ""
+            ],
+            "formatString": "\\$#,0;(\\$#,0);\\$#,0",
+            "lineageTag": "9126702b-d3f2-4916-ae57-6aa4590a3da0"
+          },
+          {
+            "name": "MoM",
+            "annotations": [
+              {
+                "name": "PBI_FormatHint",
+                "value": "{\"isGeneralNumber\":true}"
+              }
+            ],
+            "expression": [
+              "",
+              "IF(",
+              "    NOT(ISBLANK([TOtal sales])),",
+              "    CALCULATE(",
+              "                    [TOtal sales]",
+              "                        ,PREVIOUSMONTH('Date table'[Date]",
+              "                        ))",
+              "    )"
+            ],
+            "lineageTag": "86c610e8-3184-47c9-881e-d4568cfa10a9"
+          },
+          {
+            "name": "Mom %",
+            "expression": [
+              "",
+              "VAR ",
+              "    Prev=",
+              "            IF(",
+              "                 NOT(ISBLANK([TOtal sales])),",
+              "                    CALCULATE( [TOtal sales],",
+              "                                PREVIOUSMONTH('Date table'[Date])",
+              "                             )",
+              "            )",
+              "",
+              "RETURN",
+              "       DIVIDE( [TOtal sales]-Prev,Prev)"
+            ],
+            "formatString": "0.00%;-0.00%;0.00%",
+            "lineageTag": "cadebc0d-1d08-4d50-a604-e241d91a20a4"
+          },
+          {
+            "name": "Total Order",
+            "expression": "DISTINCTCOUNTNOBLANK('Order'[Order id])",
+            "formatString": "0",
+            "lineageTag": "1de735f4-3989-4d57-80e7-b072faae95e0"
+          },
+          {
+            "name": "Average order value",
+            "expression": "DIVIDE([TOtal sales],[Total Order])",
+            "formatString": "\\$#,0.###############;(\\$#,0.###############);\\$#,0.###############",
+            "lineageTag": "1bcab2fd-5848-4b93-bca9-a949c8055798"
+          },
+          {
+            "name": "Monthly sales trend",
+            "annotations": [
+              {
+                "name": "PBI_FormatHint",
+                "value": "{\"isGeneralNumber\":true}"
+              }
+            ],
+            "expression": [
+              "CALCULATE(SUM('Order details'[Sales]), FILTER(ALL('Order'), 'Order'[Date] = MAX('Order'[Date])))",
+              ""
+            ],
+            "lineageTag": "dda6272a-a904-4890-84d3-874559611f1b"
+          },
+          {
+            "name": "Order details",
+            "expression": "DISTINCTCOUNTNOBLANK('Order details'[order_details_id])",
+            "formatString": "0",
+            "lineageTag": "8d386eb6-8cdb-4f5c-8ec1-73cfc9580e5f"
+          },
+          {
+            "name": "Customer frequency",
+            "annotations": [
+              {
+                "name": "PBI_FormatHint",
+                "value": "{\"isGeneralNumber\":true}"
+              }
+            ],
+            "expression": "DIVIDE([Order details],[Total Order])",
+            "lineageTag": "a13e44b8-f9dc-4345-ab96-bd28c6f03037"
+          },
+          {
+            "name": "Average qty per order",
+            "annotations": [
+              {
+                "name": "PBI_FormatHint",
+                "value": "{\"isGeneralNumber\":true}"
+              }
+            ],
+            "expression": "DIVIDE(SUM('Order details'[quantity]),[Total Order])",
+            "lineageTag": "17a02d9c-b656-4d72-9d1b-ec298dbd74b3"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "Measure table",
+            "mode": "import",
+            "source": {
+              "expression": [
+                "let",
+                "    Source = Table.FromRows(Json.Document(Binary.Decompress(Binary.FromText(\"i44FAA==\", BinaryEncoding.Base64), Compression.Deflate)), let _t = ((type nullable text) meta [Serialized.Text = true]) in type table [Column1 = _t]),",
+                "    #\"Changed Type\" = Table.TransformColumnTypes(Source,{{\"Column1\", type text}})",
+                "in",
+                "    #\"Changed Type\""
+              ],
+              "type": "m"
+            }
+          }
+        ]
+      },
+      {
+        "name": "Order",
+        "annotations": [
+          {
+            "name": "PBI_NavigationStepName",
+            "value": "Navigation"
+          },
+          {
+            "name": "PBI_ResultType",
+            "value": "Table"
+          }
+        ],
+        "columns": [
+          {
+            "name": "Date",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              },
+              {
+                "name": "UnderlyingDateTimeDataType",
+                "value": "Date"
+              }
+            ],
+            "dataType": "dateTime",
+            "formatString": "Long Date",
+            "lineageTag": "6ac75273-280b-4ce4-a6bc-b638e31962e0",
+            "sourceColumn": "Date",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "Hour",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "User"
+              }
+            ],
+            "dataType": "int64",
+            "formatString": "0",
+            "lineageTag": "8cf50aa9-f542-4105-b903-d4b9b4d62a62",
+            "sourceColumn": "Hour",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "Order id",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ],
+            "dataType": "int64",
+            "formatString": "0",
+            "lineageTag": "a4dd4b39-430e-4233-b913-0935a5fbb239",
+            "sourceColumn": "Order id",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "Period",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ],
+            "dataType": "string",
+            "lineageTag": "5f3d00a3-b3ff-4288-9372-93d6805e8787",
+            "sourceColumn": "Period",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "Time",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              },
+              {
+                "name": "UnderlyingDateTimeDataType",
+                "value": "Time"
+              }
+            ],
+            "changedProperties": [
+              {
+                "property": "DataType"
+              }
+            ],
+            "dataType": "dateTime",
+            "formatString": "Long Time",
+            "lineageTag": "7ec4ecab-c126-4913-b258-647dc3fa1ec5",
+            "sourceColumn": "Time",
+            "summarizeBy": "none"
+          }
+        ],
+        "lineageTag": "aa18146b-edb2-4a06-8b2a-0223b15d67a9",
+        "partitions": [
+          {
+            "name": "Order",
+            "mode": "import",
+            "source": {
+              "expression": [
+                "let",
+                "    Source = Excel.Workbook(File.Contents(\"C:\\Users\\adelekedare\\OneDrive\\Desktop\\order_details (Autosaved).xlsx\"), null, true),",
+                "    Table3_Table = Source{[Item=\"Table3\",Kind=\"Table\"]}[Data],",
+                "    #\"Changed Type\" = Table.TransformColumnTypes(Table3_Table,{{\"Order id\", Int64.Type}, {\"Date\", type date}, {\"Time\", type datetime}, {\"Hour\", Int64.Type}, {\"Period\", type text}})",
+                "in",
+                "    #\"Changed Type\""
+              ],
+              "type": "m"
+            }
+          }
+        ]
+      },
+      {
+        "name": "Order details",
+        "annotations": [
+          {
+            "name": "PBI_NavigationStepName",
+            "value": "Navigation"
+          },
+          {
+            "name": "PBI_ResultType",
+            "value": "Table"
+          }
+        ],
+        "columns": [
+          {
+            "name": "Sales",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              },
+              {
+                "name": "PBI_FormatHint",
+                "value": "{\"isGeneralNumber\":true}"
+              }
+            ],
+            "dataType": "double",
+            "lineageTag": "4989865a-099f-4aaa-b77a-2d58183446af",
+            "sourceColumn": "Sales",
+            "summarizeBy": "sum"
+          },
+          {
+            "name": "order_details_id",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ],
+            "dataType": "int64",
+            "formatString": "0",
+            "lineageTag": "ea3a508a-5e9e-4373-b505-4e17cc5cab9c",
+            "sourceColumn": "order_details_id",
+            "summarizeBy": "sum"
+          },
+          {
+            "name": "order_id",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ],
+            "dataType": "int64",
+            "formatString": "0",
+            "lineageTag": "b91b10ef-b8ae-40ca-b01e-8788821b7259",
+            "sourceColumn": "order_id",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "pizza_id",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ],
+            "dataType": "string",
+            "lineageTag": "1ff222e2-e514-4b17-a459-2892e0480ed2",
+            "sourceColumn": "pizza_id",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "price",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              },
+              {
+                "name": "PBI_FormatHint",
+                "value": "{\"isGeneralNumber\":true}"
+              }
+            ],
+            "dataType": "double",
+            "lineageTag": "84d55944-f9ee-4898-9108-9cad5181e58e",
+            "sourceColumn": "price",
+            "summarizeBy": "sum"
+          },
+          {
+            "name": "quantity",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ],
+            "dataType": "int64",
+            "formatString": "0",
+            "lineageTag": "c697fa33-ad51-4340-a091-4cd0477fa726",
+            "sourceColumn": "quantity",
+            "summarizeBy": "sum"
+          }
+        ],
+        "lineageTag": "3a9a2782-bbc8-48a3-bd92-4a3dadd91490",
+        "partitions": [
+          {
+            "name": "Order details",
+            "mode": "import",
+            "source": {
+              "expression": [
+                "let",
+                "    Source = Excel.Workbook(File.Contents(\"C:\\Users\\adelekedare\\OneDrive\\Desktop\\order_details (Autosaved).xlsx\"), null, true),",
+                "    Table1_Table = Source{[Item=\"Table1\",Kind=\"Table\"]}[Data],",
+                "    #\"Changed Type\" = Table.TransformColumnTypes(Table1_Table,{{\"order_details_id\", Int64.Type}, {\"order_id\", Int64.Type}, {\"pizza_id\", type text}, {\"quantity\", Int64.Type}, {\"price\", type number}, {\"Sales\", type number}})",
+                "in",
+                "    #\"Changed Type\""
+              ],
+              "type": "m"
+            }
+          }
+        ]
+      },
+      {
+        "name": "Pizza type",
+        "annotations": [
+          {
+            "name": "PBI_NavigationStepName",
+            "value": "Navigation"
+          },
+          {
+            "name": "PBI_ResultType",
+            "value": "Table"
+          }
+        ],
+        "columns": [
+          {
+            "name": "category",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ],
+            "dataType": "string",
+            "lineageTag": "9ef2c5c5-dead-4017-8794-3d9d7972c52e",
+            "sourceColumn": "category",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "name",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ],
+            "dataType": "string",
+            "lineageTag": "51e6cc31-4038-4ce8-8330-ab7fab34aa51",
+            "sourceColumn": "name",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "pizza_type_id",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ],
+            "dataType": "string",
+            "lineageTag": "d0cefece-7df8-414d-92ae-e611784305ce",
+            "sourceColumn": "pizza_type_id",
+            "summarizeBy": "none"
+          }
+        ],
+        "lineageTag": "55dedfa4-ee07-4e1f-9186-7a8f2c49ba7f",
+        "partitions": [
+          {
+            "name": "Pizza type",
+            "mode": "import",
+            "source": {
+              "expression": [
+                "let",
+                "    Source = Excel.Workbook(File.Contents(\"C:\\Users\\adelekedare\\OneDrive\\Desktop\\order_details (Autosaved).xlsx\"), null, true),",
+                "    Table4_Table = Source{[Item=\"Table4\",Kind=\"Table\"]}[Data],",
+                "    #\"Changed Type\" = Table.TransformColumnTypes(Table4_Table,{{\"pizza_type_id\", type text}, {\"name\", type text}, {\"category\", type text}})",
+                "in",
+                "    #\"Changed Type\""
+              ],
+              "type": "m"
+            }
+          }
+        ]
+      },
+      {
+        "name": "pizza_table",
+        "annotations": [
+          {
+            "name": "PBI_NavigationStepName",
+            "value": "Navigation"
+          },
+          {
+            "name": "PBI_ResultType",
+            "value": "Table"
+          }
+        ],
+        "columns": [
+          {
+            "name": "Index",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              },
+              {
+                "name": "PBI_FormatHint",
+                "value": "{\"isGeneralNumber\":true}"
+              }
+            ],
+            "dataType": "double",
+            "lineageTag": "5fc55dcc-04e1-4915-bd40-69531057f8ad",
+            "sourceColumn": "Index",
+            "summarizeBy": "sum"
+          },
+          {
+            "name": "pizza_id",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ],
+            "dataType": "string",
+            "lineageTag": "7c217821-512d-4e45-8f4a-4a833c19c55d",
+            "sourceColumn": "pizza_id",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "pizza_type_id",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ],
+            "dataType": "string",
+            "lineageTag": "beda43ce-dc11-44a9-b11b-695f4e7974e5",
+            "sourceColumn": "pizza_type_id",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "price",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              },
+              {
+                "name": "PBI_FormatHint",
+                "value": "{\"isGeneralNumber\":true}"
+              }
+            ],
+            "dataType": "double",
+            "lineageTag": "a238d459-0364-40b8-a2fc-3e38a0fb93d3",
+            "sourceColumn": "price",
+            "summarizeBy": "sum"
+          },
+          {
+            "name": "size",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ],
+            "changedProperties": [
+              {
+                "property": "SortByColumn"
+              }
+            ],
+            "dataType": "string",
+            "lineageTag": "1bcfeebe-75c2-414f-ad59-0905bffa9a6a",
+            "sortByColumn": "Index",
+            "sourceColumn": "size",
+            "summarizeBy": "none"
+          }
+        ],
+        "lineageTag": "b7906487-d16a-4705-a75a-6f96423dec26",
+        "partitions": [
+          {
+            "name": "pizza_table",
+            "mode": "import",
+            "source": {
+              "expression": [
+                "let",
+                "    Source = Excel.Workbook(File.Contents(\"C:\\Users\\adelekedare\\OneDrive\\Desktop\\order_details (Autosaved).xlsx\"), null, true),",
+                "    pizza_table_Table = Source{[Item=\"pizza_table\",Kind=\"Table\"]}[Data],",
+                "    #\"Changed Type\" = Table.TransformColumnTypes(pizza_table_Table,{{\"pizza_id\", type text}, {\"pizza_type_id\", type text}, {\"size\", type text}, {\"price\", type number}}),",
+                "    #\"Added Conditional Column\" = Table.AddColumn(#\"Changed Type\", \"Custom\", each if [size] = \"S\" then 1 else if [size] = \"M\" then 2 else if [size] = \"L\" then 3 else if [size] = \"XL\" then 4 else if [size] = \"XXL\" then 5 else null, type number),",
+                "    #\"Renamed Columns\" = Table.RenameColumns(#\"Added Conditional Column\",{{\"Custom\", \"Index\"}})",
+                "in",
+                "    #\"Renamed Columns\""
+              ],
+              "type": "m"
+            }
+          }
+        ]
+      }
+    ]
+  }
+}

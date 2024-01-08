@@ -1,0 +1,100 @@
+{
+  "version": "1.1.0",
+  "diagrams": [
+    {
+      "ordinal": 0,
+      "scrollPosition": {
+        "x": 10.833333333333334,
+        "y": 0
+      },
+      "nodes": [
+        {
+          "location": {
+            "x": 0,
+            "y": 0
+          },
+          "nodeIndex": "Date table",
+          "nodeLineageTag": "1d4b99e7-a013-441a-a224-2c652291b7c7",
+          "size": {
+            "height": 300,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 77.142857142857167,
+            "y": 420.97598852448925
+          },
+          "nodeIndex": "Order",
+          "nodeLineageTag": "aa18146b-edb2-4a06-8b2a-0223b15d67a9",
+          "size": {
+            "height": 200,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 494.20225510460887,
+            "y": 467.02954472175924
+          },
+          "nodeIndex": "Order details",
+          "nodeLineageTag": "3a9a2782-bbc8-48a3-bd92-4a3dadd91490",
+          "size": {
+            "height": 224,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 956.907877202851,
+            "y": 0
+          },
+          "nodeIndex": "Pizza type",
+          "nodeLineageTag": "55dedfa4-ee07-4e1f-9186-7a8f2c49ba7f",
+          "size": {
+            "height": 152,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 752.69611610117011,
+            "y": 188.66441205497969
+          },
+          "nodeIndex": "pizza_table",
+          "nodeLineageTag": "b7906487-d16a-4705-a75a-6f96423dec26",
+          "size": {
+            "height": 200,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 1240.9078772028511,
+            "y": 293.51477236087965
+          },
+          "nodeIndex": "Measure table",
+          "nodeLineageTag": "868bbc83-443a-4f50-8f02-84d2169901d9",
+          "size": {
+            "height": 104,
+            "width": 234
+          },
+          "zIndex": 0
+        }
+      ],
+      "name": "All tables",
+      "zoomValue": 60,
+      "pinKeyFieldsToTop": false,
+      "showExtraHeaderInfo": false,
+      "hideKeyFieldsWhenCollapsed": false,
+      "tablesLocked": false
+    }
+  ],
+  "selectedDiagram": "All tables",
+  "defaultDiagram": "All tables"
+}
